@@ -36,9 +36,11 @@
 		$ git submodule update --init
 		
 		$ ./autogen.sh
+		
+		$ mkdir configure && cd configure
 		$ ./configure
 		
-		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./Configure mingw64 no-asm shared --prefix=/usr/mw64
+		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./configure mingw64 no-asm shared --prefix=/usr/mw64
 		$ PATH=$PATH:/usr/mw64/bin make
 		$ PATH=$PATH:/usr/mw64/bin make install
 		
@@ -53,25 +55,16 @@
 		> cd grpc
 		> @rem To update submodules at later time, run "git submodule update --init"
 		
-		> git clone https://github.com/grpc/grpc.git && cd grpc
+		$ sudo apt-get install autoconf automake libtool curl make g++ unzip		
+		$ git clone https://github.com/grpc/grpc.git && cd grpc
+		$ git submodule update --init
 		
-		> git submodule init
-		> git submodule update
+		$ mkdir configure && cd configure
+		$ ./configure
 		
-		> mkdir _build
-		> cd _build
-		
-		> cmake .. -G "MinGW Makefiles"
-		
-		$ mkdir _build && cd _build
-		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./_build mingw64 no-asm shared --prefix=/usr/mw64
+		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./configure mingw64 no-asm shared --prefix=/usr/mw64
 		$ PATH=$PATH:/usr/mw64/bin make
 		$ PATH=$PATH:/usr/mw64/bin make install
-		
-		> cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
-		> cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
-		
-		> mingw32-make install 
 	
 	
 	
