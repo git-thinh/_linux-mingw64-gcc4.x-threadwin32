@@ -41,6 +41,16 @@
 		$ ./configure
 		
 		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./configure mingw64 no-asm shared --prefix=/mnt/c/mw64
+		
+		$ mkdir build-64 && cd build-64
+		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./build-64 mingw64 no-asm shared --prefix=/mnt/c/mw64
+		$ cmake -DTARGET_ARCH=mingw64 -DCMAKE_INSTALL_PREFIX=prefix
+		
+		$ cmake -G "mingw64 Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/mnt/c/mw64/ ..
+		$ make && make install
+		
+		$ cmake -G "mingw64 Makefiles"
+		
 		$ PATH=$PATH:/mnt/c/mw64/bin make
 		$ PATH=$PATH:/mnt/c/mw64/bin make install
 		
@@ -52,6 +62,7 @@
 	# Build & install GRPC:		
 		$ sudo apt-get install autoconf automake libtool curl make g++ unzip
 		$ sudo apt-get install git cmake golang-go perl
+		$ sudo apt-get install zlib
 		
 		$ git clone https://github.com/grpc/grpc.git && cd grpc
 		$ git submodule update --init
