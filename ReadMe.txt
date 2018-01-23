@@ -35,6 +35,16 @@
 		$ git clone https://github.com/google/protobuf.git && cd grpc		
 		$ git submodule update --init
 		
+		
+		$ mkdir build-64 && cd build-64
+		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./build-64 mingw64 no-asm shared --prefix=/mnt/c/mw64		
+		$ cmake -DTARGET_ARCH=mingw64 -DCMAKE_INSTALL_PREFIX=prefix     # prefix is folder export result (include, libs)
+		$ PATH=$PATH:/mnt/c/mw64/bin make
+		$ PATH=$PATH:/mnt/c/mw64/bin make install
+		
+		
+		
+		
 		$ ./autogen.sh
 		
 		$ mkdir configure && cd configure
@@ -66,6 +76,16 @@
 		
 		$ git clone https://github.com/grpc/grpc.git && cd grpc
 		$ git submodule update --init
+		
+		
+		$ mkdir build-64 && cd build-64
+		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./build-64 mingw64 no-asm shared --prefix=/mnt/c/mw64		
+		$ cmake -DTARGET_ARCH=mingw64 -DCMAKE_INSTALL_PREFIX=prefix     # prefix is folder export result (include, libs)
+		$ PATH=$PATH:/mnt/c/mw64/bin make
+		$ PATH=$PATH:/mnt/c/mw64/bin make install
+		
+		
+		
 		
 		$ mkdir configure && cd configure
 		$ ./configure
