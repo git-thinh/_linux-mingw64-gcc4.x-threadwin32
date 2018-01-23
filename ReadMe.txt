@@ -26,9 +26,9 @@
 	# Build & install OpenSSL:
 		$ tar zxvf openssl-1.0.0e.tar.gz
 		$ cd openssl-1.0.0e
-		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./Configure mingw64 no-asm shared --prefix=/usr/mw64
-		$ PATH=$PATH:/usr/mw64/bin make
-		$ PATH=$PATH:/usr/mw64/bin make install
+		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./Configure mingw64 no-asm shared --prefix=/mnt/c/mw64
+		$ PATH=$PATH:/mnt/c/mw64/bin make
+		$ PATH=$PATH:/mnt/c/mw64/bin make install
 
 	# Build & install Protobuf:
 		$ sudo apt-get install autoconf automake libtool curl make g++ unzip		
@@ -40,22 +40,19 @@
 		$ mkdir configure && cd configure
 		$ ./configure
 		
-		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./configure mingw64 no-asm shared --prefix=/usr/mw64
-		$ PATH=$PATH:/usr/mw64/bin make
-		$ PATH=$PATH:/usr/mw64/bin make install
+		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./configure mingw64 no-asm shared --prefix=/mnt/c/mw64
+		$ PATH=$PATH:/mnt/c/mw64/bin make
+		$ PATH=$PATH:/mnt/c/mw64/bin make install
 		
 		$ make check
 		$ sudo make install
 		$ sudo ldconfig # refresh shared library cache.	
 		
 				
-	# Build & install GRPC:
-		> @rem You can also do just "git clone --recursive -b THE_BRANCH_YOU_WANT https://github.com/grpc/grpc"
-		> powershell git clone --recursive -b ((New-Object System.Net.WebClient).DownloadString(\"https://grpc.io/release\").Trim()) https://github.com/grpc/grpc
-		> cd grpc
-		> @rem To update submodules at later time, run "git submodule update --init"
+	# Build & install GRPC:		
+		$ sudo apt-get install autoconf automake libtool curl make g++ unzip
+		$ sudo apt-get install git cmake golang-go perl
 		
-		$ sudo apt-get install autoconf automake libtool curl make g++ unzip		
 		$ git clone https://github.com/grpc/grpc.git && cd grpc
 		$ git submodule update --init
 		
