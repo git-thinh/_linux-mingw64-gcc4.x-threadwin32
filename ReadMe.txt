@@ -1,14 +1,40 @@
 
-CROSS_COMPILE="x86_64-w64-mingw32-" ./Configure mingw64 no-asm shared --prefix=/usr/mw64
-PATH=$PATH:/usr/mw64/bin make
+	#Go to SU to install the 1.0 cross-compilers for all users
+	$ su        #SU to root; give root password to continue
+	$ cd /usr/  #Make installation directories in /usr/
+	$ mkdir mw32   #If this is the first time, and mw32 doesn't exist yet
+	$ mkdir mw64   #If this is the first time, and mw64 doesn't exist yet
 
---------------------------------------------------------
---------------------------------------------------------
-export PATH=$PATH:/mnt/c/mingw-w64-x86_64-gcc7.2.0-win32-sjlj/mingw64/bin
-export PATH=/mnt/c/mingw-w64-x86_64-gcc7.2.0-win32-sjlj/mingw64/bin:$PATH
-export PATH=$PATH:/c/Program\ Files/GTK+-2.22/bin
+	#Install the 1.0 W32 cross-compiler
+	$ cd mw32
+	$ rm -rf ./*    #Remove previous installation, if any
+	$ tar -xvf mingw-w64-bin_x86_64-linux_20131228.tar.bz2
+	$ cd ..
 
+	#Install the W64 cross-compiler
+	$ cd mw64
+	$ rm -rf ./*    #Remove previous installation, if any
+	$ tar -xvf mingw-w64-bin_x86_64-linux_20131228.tar.bz2
+
+	# Build & install OpenSSL:
+	$ tar zxvf openssl-1.0.0e.tar.gz
+	$ cd openssl-1.0.0e
+	$ CROSS_COMPILE="x86_64-w64-mingw32-" ./Configure mingw64 no-asm shared --prefix=/usr/mw64
+	$ PATH=$PATH:/usr/mw64/bin make
+	$ PATH=$PATH:/usr/mw64/bin make install
+
+	# Build & install GRPC:
+	
+	
+	
+	
+	$ export PATH=$PATH:/mnt/c/mingw-w64-x86_64-gcc7.2.0-win32-sjlj/mingw64/bin
+	$ export PATH=/mnt/c/mingw-w64-x86_64-gcc7.2.0-win32-sjlj/mingw64/bin:$PATH
+	$ export PATH=$PATH:/c/Program\ Files/GTK+-2.22/bin
+
+////////////////////////////////////////////////////////////////////////////////////////////
 UsingLinuxBinaries
+////////////////////////////////////////////////////////////////////////////////////////////
 
 Overview
 Here we will discuss installation of mingw-w64 cross-compilers for Windows 32-bit and 64-bit cross-compilers under Linux. There are two types of binaries for mingw-w64 on-line right now, the "1.0" stable and snapshot builds, and the "cutting edge" builds that use the latest available builds of gcc and other compilers. They are installed differently (for now) but are used the same way. Both run under Linux and generate Windows binary executable files of the format foo.exe. If you do your own builds from the source code, one method or the other, or both, should work for you, with minor changes that reflect the way that you do things.
@@ -112,9 +138,9 @@ All you need to do to use any of the compilers is to insert mw32/bin or mw64/bin
   #PATH will revert to the system value when the script exits
 
 
---------------------------------------------------------
---------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////////////////
 MinGW-w64 personal 'sezero' build from 2011-11-01.
+////////////////////////////////////////////////////////////////////////////////////////////
 
 Source tarball:
 ----------------
@@ -211,3 +237,98 @@ an undersocore to the symbols and follows the MSVC x64
 convention.  Therefore, any of the link libraries from
 older toolchains are incompatible with the ones created
 by these new builds.
+
+////////////////////////////////////////////////////////////////////////////////////////////
+OpenSSL for Windows
+////////////////////////////////////////////////////////////////////////////////////////////
+
+In earlier articles, we have looked at how to create a gcc build environment on Windows, and also how to compile binaries for Windows on Linux, using the MinGW-w64 suite to be able to support native 64-bit Windows builds.
+
+But in order to build useful applications in these environments, we often need some common libraries. In this article, we will have a look at how to compile the OpenSSL library and make a small application that uses it. Compiled OpenSSL libraries are available for download (see the link at the bottom), in case you don’t want to do the compilation yourself.
+
+ 
+
+prerequisites
+We will be cross-compiling from Linux. If you want to use Windows only, please consider downloading the compiled OpenSSL binaries near the bottom of the page, or adjust the paths accordingly when building the library.
+
+I have my 64-bit Windows build environment installed in /opt/mingw64, and the cross-compiler prefix is x86_64-w64-mingw32. I will target (build binaries for) 64-bit Windows in this article. Please adjust these variables according to your own build environment. i686-w64-mingw32 is the prefix for the 32-bit Windows cross-compiler.
+
+ 
+
+compiling openssl
+Follow the simple instructions on how to set up a Windows build environment on Linux. It is also possible to do this on Windows, but it is simpler and faster using Linux. Please leave a comment if you would like me to describe how to build on Windows.
+Grab the desired OpenSSL source tarball. Use OpenSSL version 1.0.0 or newer; OpenSSL versions older than v1.0.0 are a bit harder to build on Windows, but let me know if you want to see how to do this.  I’ll use OpenSSL version 1.0.0e in the following, but the steps should be identical for any version newer than 1.0.0.
+Put your tarball in a temporary directory, e.g. /tmp and unpack it:
+
+	$ tar zxvf openssl-1.0.0e.tar.gz
+	
+Run the configure script to use the 64-bit Windows compiler.
+	$ cd openssl-1.0.0e
+
+	$ CROSS_COMPILE="x86_64-w64-mingw32-" ./Configure mingw64 no-asm shared --prefix=/opt/mingw64
+…
+Configured for mingw64.
+Compile. Make sure the the cross-compiler is in your path, or add it explicitly as show below.
+
+	$ PATH=$PATH:/opt/mingw64/bin make
+…
+Install it.
+
+	$ sudo PATH=$PATH:/opt/mingw64/bin make install
+	
+We now have the OpenSSL libraries and headers for 64-bit Windows installed. Repeat the steps above with CROSS_COMPILE="i686-w64-mingw32-" and prefix /opt/mingw32 to build and install the 32-bit libraries for Windows.
+ 
+
+A simple application
+
+To confirm OpenSSL is working correctly, let’s create  a small C application that generates a SHA-256 digest of a character string. It reads a string given as the argument, generates the digest and shows the computed digest. The digest-generating code is shown below, while the complete code is available for download.
+
+	void SHA256Hash(unsigned char digest[EVP_MAX_MD_SIZE], char *stringToHash)
+	{
+		OpenSSL_add_all_digests();
+
+		const EVP_MD *md = EVP_get_digestbyname(“sha256”);
+
+		EVP_MD_CTX context;
+		EVP_MD_CTX_init(&context);
+		EVP_DigestInit_ex(&context, md, NULL);
+		EVP_DigestUpdate(&context, (unsigned char *)stringToHash, strlen(stringToHash));
+
+		unsigned int digestSz;
+		EVP_DigestFinal_ex(&context, digest, &digestSz);
+		EVP_MD_CTX_cleanup(&context);
+
+		EVP_cleanup();
+	}
+
+Save the file sha256.c in a working directory.
+Compile it.
+
+	$ /opt/mingw64/bin/x86_64-w64-mingw32-gcc -I/opt/mingw64/include -L/opt/mingw64/lib -Wall sha256.c -lcrypto -o sha256.exe
+	
+Check that the executable has the correct binary format (PE32+ is 64-bit).
+
+	$ file sha256.exe
+	
+sha256.exe: PE32+ executable for MS Windows (console) Mono/.Net assembly
+Copy our new program to a 64-bit Windows machine, and run it in the Windows Command Prompt.
+
+	> sha256.exe 12345
+
+The last step should generate the following dialog box, which contains the SHA-256 digest of the string “12345”.
+
+	sha256.exe sample run
+
+ 
+
+openssl windows binaries
+In case you don’t want to compile the OpenSSL library yourself, I have compiled version 1.0.0e and made it available for download below.
+
+OpenSSL 1.0.0e for 32-bit MinGW-w64 (prefix i686-w64-mingw32)
+OpenSSL 1.0.0e for 64-bit MinGW-w64 (prefix x86_64-w64-mingw32)
+Just unpack each tarball to your respective MinGW-w64 installation directory. They should work both if you are running the gcc compiler on Windows, as well as cross-compiling for Windows like we have done above.
+
+Please leave a comment if you found this interesting or have suggestions for improvements!
+
+
+
