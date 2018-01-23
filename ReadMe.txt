@@ -34,12 +34,18 @@
 		$ sudo apt-get install autoconf automake libtool curl make g++ unzip		
 		$ git clone https://github.com/google/protobuf.git && cd grpc		
 		$ git submodule update --init
-			
-		$ mkdir _build && cd _build
+		
+		$ ./autogen.sh
+		$ ./configure
 		
 		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./Configure mingw64 no-asm shared --prefix=/usr/mw64
 		$ PATH=$PATH:/usr/mw64/bin make
 		$ PATH=$PATH:/usr/mw64/bin make install
+		
+		$ make check
+		$ sudo make install
+		$ sudo ldconfig # refresh shared library cache.	
+		
 				
 	# Build & install GRPC:
 		> @rem You can also do just "git clone --recursive -b THE_BRANCH_YOU_WANT https://github.com/grpc/grpc"
