@@ -3,30 +3,69 @@
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 	#Go to SU to install the 1.0 cross-compilers for all users
-	$ su        #SU to root; give root password to continue
-	$ cd /usr/  #Make installation directories in /usr/
-	$ mkdir mw32   #If this is the first time, and mw32 doesn't exist yet
-	$ mkdir mw64   #If this is the first time, and mw64 doesn't exist yet
+		$ su        #SU to root; give root password to continue
+		$ cd /usr/  #Make installation directories in /usr/
+		$ mkdir mw32   #If this is the first time, and mw32 doesn't exist yet
+		$ mkdir mw64   #If this is the first time, and mw64 doesn't exist yet
 
-	#Install the 1.0 W32 cross-compiler
-	$ cd mw32
-	$ rm -rf ./*    #Remove previous installation, if any
-	$ tar -xvf mingw-w64-bin_x86_64-linux_20131228.tar.bz2
-	$ cd ..
+		#Install the 1.0 W32 cross-compiler
+		$ cd mw32
+		$ rm -rf ./*    #Remove previous installation, if any
+		$ tar -xvf mingw-w64-bin_x86_64-linux_20131228.tar.bz2
+		$ cd ..
 
 	#Install the W64 cross-compiler
-	$ cd mw64
-	$ rm -rf ./*    #Remove previous installation, if any
-	$ tar -xvf mingw-w64-bin_x86_64-linux_20131228.tar.bz2
+		$ cd mw64
+		$ rm -rf ./*    #Remove previous installation, if any
+		$ tar -xvf mingw-w64-bin_x86_64-linux_20131228.tar.bz2
+
+		$ ./x86_64-w64-mingw32-gcc main.cpp -o _main.exe
+		$ ./x86_64-w64-mingw32-gcc -v
+		$ ./x86_64-w64-mingw32-gcc --version
 
 	# Build & install OpenSSL:
-	$ tar zxvf openssl-1.0.0e.tar.gz
-	$ cd openssl-1.0.0e
-	$ CROSS_COMPILE="x86_64-w64-mingw32-" ./Configure mingw64 no-asm shared --prefix=/usr/mw64
-	$ PATH=$PATH:/usr/mw64/bin make
-	$ PATH=$PATH:/usr/mw64/bin make install
+		$ tar zxvf openssl-1.0.0e.tar.gz
+		$ cd openssl-1.0.0e
+		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./Configure mingw64 no-asm shared --prefix=/usr/mw64
+		$ PATH=$PATH:/usr/mw64/bin make
+		$ PATH=$PATH:/usr/mw64/bin make install
 
+	# Build & install Protobuf:
+		$ sudo apt-get install autoconf automake libtool curl make g++ unzip		
+		$ git clone https://github.com/google/protobuf.git && cd grpc		
+		$ git submodule update --init
+			
+		$ mkdir _build && cd _build
+		
+		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./Configure mingw64 no-asm shared --prefix=/usr/mw64
+		$ PATH=$PATH:/usr/mw64/bin make
+		$ PATH=$PATH:/usr/mw64/bin make install
+				
 	# Build & install GRPC:
+		> @rem You can also do just "git clone --recursive -b THE_BRANCH_YOU_WANT https://github.com/grpc/grpc"
+		> powershell git clone --recursive -b ((New-Object System.Net.WebClient).DownloadString(\"https://grpc.io/release\").Trim()) https://github.com/grpc/grpc
+		> cd grpc
+		> @rem To update submodules at later time, run "git submodule update --init"
+		
+		> git clone https://github.com/grpc/grpc.git && cd grpc
+		
+		> git submodule init
+		> git submodule update
+		
+		> mkdir _build
+		> cd _build
+		
+		> cmake .. -G "MinGW Makefiles"
+		
+		$ mkdir _build && cd _build
+		$ CROSS_COMPILE="x86_64-w64-mingw32-" ./_build mingw64 no-asm shared --prefix=/usr/mw64
+		$ PATH=$PATH:/usr/mw64/bin make
+		$ PATH=$PATH:/usr/mw64/bin make install
+		
+		> cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+		> cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+		
+		> mingw32-make install 
 	
 	
 	
